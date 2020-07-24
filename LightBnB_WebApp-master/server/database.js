@@ -1,39 +1,20 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
-
+const pool = require('../db')
 
 /// Users
-
 /**
  * Get a single user from the database given their email.
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
+
 const getUserWithEmail = function(email) {
 return pool.query(`
   SELECT * FROM users
   where email = $1
   `, [email])
   .then(res => res.rows[0] || null);
-   
- /* let user;
-  for (const userId in users) {
-    user = users[userId];
-    if (user.email.toLowerCase() === email.toLowerCase()) {
-      break;
-    } else {
-      user = null;
-    }
-  }
-  return Promise.resolve(user);*/
 }
 exports.getUserWithEmail = getUserWithEmail;
 
@@ -48,11 +29,8 @@ const getUserWithId = function(id) {
   where id = $1
   `, [id])
   .then(res => res.rows[0] || null);
-
- // return Promise.resolve(users[id]);
 }
 exports.getUserWithId = getUserWithId;
-
 
 /**
  * Add a new user to the database.
@@ -68,8 +46,6 @@ const addUser =  function(user) {
   .then(res => res.rows[0] || null);
 }
 exports.addUser = addUser;
-
-/// Reservations
 
 /**
  * Get all reservations for a single user.
@@ -90,12 +66,9 @@ const getAllReservations = function(guest_id, limit = 10) {
   `, [guest_id, limit])
   .then(res => res.rows || null);
 
-////
-  //return getAllProperties(null, 2);
 }
 exports.getAllReservations = getAllReservations;
 
-/// Properties
 
 /**
  * Get all properties.
@@ -138,8 +111,6 @@ if (options.maximum_price_per_night) {
   LIMIT $${queryParams.length};
   `;
  
-  console.log(queryString);
-  console.log(queryParams);
   return pool.query(queryString, queryParams)
   .then(res => res.rows);
 }
@@ -172,11 +143,5 @@ const addProperty = function(property) {
     property.number_of_bathrooms,
     property.number_of_bedrooms])
   .then(res => res.rows[0] || null);
-
-  ///
-  //const propertyId = Object.keys(properties).length + 1;
-  //property.id = propertyId;
- // properties[propertyId] = property;
- // return Promise.resolve(property);
 }
 exports.addProperty = addProperty;
